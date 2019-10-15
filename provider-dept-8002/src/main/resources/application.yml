@@ -1,0 +1,30 @@
+server:
+  port: 8082
+mybatis:
+  config-location: classpath:mybatis/mybatis.cfg.xml
+  type-aliases-package: com.qyn.entity
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
+spring:
+  application:
+    name: provider-dept-8001
+  datasource:
+    url: jdbc:mysql://localhost:3306/cloudDB02
+    username: root
+    password: root
+    #当前数据库类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    #mysql驱动包
+    driver-class-name: org.gjt.mm.mysql.Driver
+eureka:
+  client: #客户端注册进eureka服务列表内
+    service-url:
+      #defaultZone: http://eureka7001.com:7001/eureka
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka,http://eureka7003.com:7003/eureka
+  instance:
+    instance-id: provider_dept8001  #主机映射名称
+    prefer-ip-address: true  #主机ip信息提示
+info:
+  app.name: com.qyn.cloud
+  author: qiaoyn
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$

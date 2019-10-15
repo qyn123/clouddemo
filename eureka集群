@@ -1,0 +1,51 @@
+Eureka集群配置
+1.新建maven工程
+Eureka7001,Eureka7002,Eureka7003
+2.pom文件配置
+Eureka7001，Eureka7002， Eureka7003
+<dependencies> <!--服务端--> <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud- starter-netflix-eureka-server --> <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-eureka-server</artifactId> </dependency> <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-web</artifactId> </dependency> </dependencies>
+3.修改各自的主启动类
+Eureka7001：
+@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class}) @EnableEurekaServer //eurekaserver服务器启动类，接收其他服务注册进来
+public class eureka_7001 { public static void main(String args[]){ SpringApplication.run(eureka_7001.class,args); } }
+Eureka7002：
+@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class}) @EnableEurekaServer //eurekaserver服务器启动类，接收其他服务注册进来
+public class eureka_7002 { public static void main(String args[]){ SpringApplication.run(eureka_7002.class,args); } }
+Eureka7003：
+@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class}) @EnableEurekaServer //eurekaserver服务器启动类，接收其他服务注册进来
+public class eureka_7003 { public static void main(String args[]){ SpringApplication.run(eureka_7003.class,args); } }
+4.域名映射
+修改C:\Windows\System32\drivers\etc中的host文件
+127.0.0.1 eureka7001.com
+127.0.0.1 eureka7002.com
+127.0.0.1 eureka7003.com
+5.修改yml文件
+Eureka7001：
+  server: port: 7001 eureka: instance: hostname: eureka7001.com #eureka服务端的实例名称
+  client: register-with-eureka: false #false表示不向注册中心注册自己
+  fetch-registry: false #false表示自己端就是注册中心，我们的职责就是维护服务实例，并不需要
+  检测服务
+  service-url: defaultZone: http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
+Eureka7002：
+  server: port: 7002 eureka: instance: hostname: eureka7002.com #eureka服务端的实例名称
+  client: register-with-eureka: false #false表示不向注册中心注册自己
+  fetch-registry: false #false表示自己端就是注册中心，我们的职责就是维护服务实例，并不需要
+  检测服务
+  service-url: defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7003.com:7003/eureka/
+Eureka7003：
+    server: port: 7003 eureka: instance: hostname: eureka7003.com #eureka服务端的实例名称
+    client: register-with-eureka: false #false表示不向注册中心注册自己
+    fetch-registry: false #false表示自己端就是注册中心，我们的职责就是维护服务实例，并不需要
+    检测服务
+    service-url: defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
+6.注册中心修改
+    server: port: 8081 mybatis: config-location: classpath:mybatis/mybatis.cfg.xml type-aliases-package: com.qyn.entity mapper-locations: classpath:mybatis/mapper/**/*.xml spring: application: name: provider_dept_8001 datasource: url: jdbc:mysql://localhost:3306/cloudDB01 username: root password: root #当前数据库类型
+    type: com.alibaba.druid.pool.DruidDataSource #mysql驱动包
+    driver-class-name: org.gjt.mm.mysql.Driver eureka: client: #客户端注册进eureka服务列表内
+    service-url: #defaultZone: http://eureka7001.com:7001/eureka defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka,http://eureka7003.com:7003/eureka instance: instance-id: provider_dept8001 #主机映射名称
+    prefer-ip-address: true #主机ip信息提示
+    info: app.name: com.qyn.cloud author: qiaoyn build.artifactId: $project.artifactId$ build.version: $project.version$
+7.访问：
+http://eureka7003.com:7003/
+注意：
+红色字体为eureka自我保护，不是错误
